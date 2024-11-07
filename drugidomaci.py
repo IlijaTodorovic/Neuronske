@@ -8,7 +8,7 @@ import random
 import os
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, Activation, BatchNormalization
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 FAST_RUN = False
 IMAGE_WIDTH=128
@@ -112,7 +112,7 @@ validation_generator = validation_datagen.flow_from_dataframe(
 )
 
 epochs=3 if FAST_RUN else 50
-history = model.fit_generator(
+history = model.fit(
     train_generator, 
     epochs=epochs,
     validation_data=validation_generator,
