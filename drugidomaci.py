@@ -92,7 +92,7 @@ train_datagen = ImageDataGenerator(
 
 train_generator = train_datagen.flow_from_dataframe(
     train_df, 
-    "train", 
+    "train/", 
     x_col='filename',
     y_col='category',
     target_size=IMAGE_SIZE,
@@ -103,7 +103,7 @@ train_generator = train_datagen.flow_from_dataframe(
 validation_datagen = ImageDataGenerator(rescale=1./255)
 validation_generator = validation_datagen.flow_from_dataframe(
     validate_df, 
-    "../input/train/train/", 
+    "train/", 
     x_col='filename',
     y_col='category',
     target_size=IMAGE_SIZE,
@@ -121,4 +121,35 @@ history = model.fit(
     callbacks=callbacks
 )
 
+test_filenames = os.listdir("test1")
+test_df = pd.DataFrame({
+    'filename': test_filenames
+})
+nb_samples = test_df.shape[0]
 
+test_gen = ImageDataGenerator(rescale=1./255)
+test_generator = test_gen.flow_from_dataframe(
+    test_df, 
+    "test1/", 
+    x_col='filename',
+    y_col=None,
+    class_mode=None,
+    target_size=IMAGE_SIZE,
+    batch_size=batch_size,
+    shuffle=False
+)
+
+predict = model.predict_generator(test_generator, steps=np.ceil(nb_samples/batch_size))
+
+test_df['category'] = np.argmax(predict, axis=-1)
+
+label_map = dict((v,k) for k,v in train_generator.class_indices.items())
+test_df['category'] = test_df['category'].replace(label_map)
+
+test_df['category'] = test_df['category'].replace({ 'dog': 1, 'cat': 0 })
+
+submission_df = test_df.copy()
+submission_df['id'] = submission_df['filename'].str.split('.').str[0]
+submission_df['label'] = submission_df['category']
+submission_df.drop(['filename', 'category'], axis=1, inplace=True)
+submission_df.to_csv('submission.csv', index=False)
