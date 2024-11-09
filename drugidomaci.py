@@ -78,7 +78,7 @@ validate_df = validate_df.reset_index(drop=True)
 
 total_train = train_df.shape[0]
 total_validate = validate_df.shape[0]
-batch_size=15
+batch_size=25
 
 train_datagen = ImageDataGenerator(
     rotation_range=15,
@@ -111,7 +111,7 @@ validation_generator = validation_datagen.flow_from_dataframe(
     batch_size=batch_size
 )
 
-epochs=3 if FAST_RUN else 50
+epochs=40
 history = model.fit(
     train_generator, 
     epochs=epochs,
@@ -139,7 +139,7 @@ test_generator = test_gen.flow_from_dataframe(
     shuffle=False
 )
 
-predict = model.predict_generator(test_generator, steps=np.ceil(nb_samples/batch_size))
+predict = model.predict(test_generator, steps=np.ceil(nb_samples/batch_size))
 
 test_df['category'] = np.argmax(predict, axis=-1)
 
