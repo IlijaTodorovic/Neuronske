@@ -37,7 +37,7 @@ model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
 
-model.add(Conv2D(32, (5, 5), activation='relu', input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_CHANNELS)))
+model.add(Conv2D(32, (5, 5), activation='relu'))
 model.add(BatchNormalization())
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
@@ -62,7 +62,7 @@ model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['ac
 
 earlystop = EarlyStopping(patience=10)
 
-learning_rate_reduction = ReduceLROnPlateau(monitor='val_acc', 
+learning_rate_reduction = ReduceLROnPlateau(monitor='val_accuracy', 
                                             patience=2, 
                                             verbose=1, 
                                             factor=0.5, 
@@ -78,7 +78,7 @@ validate_df = validate_df.reset_index(drop=True)
 
 total_train = train_df.shape[0]
 total_validate = validate_df.shape[0]
-batch_size=25
+batch_size=15
 
 train_datagen = ImageDataGenerator(
     rotation_range=15,
@@ -92,7 +92,7 @@ train_datagen = ImageDataGenerator(
 
 train_generator = train_datagen.flow_from_dataframe(
     train_df, 
-    "train/", 
+    "train", 
     x_col='filename',
     y_col='category',
     target_size=IMAGE_SIZE,
@@ -103,7 +103,7 @@ train_generator = train_datagen.flow_from_dataframe(
 validation_datagen = ImageDataGenerator(rescale=1./255)
 validation_generator = validation_datagen.flow_from_dataframe(
     validate_df, 
-    "train/", 
+    "train", 
     x_col='filename',
     y_col='category',
     target_size=IMAGE_SIZE,
@@ -111,7 +111,7 @@ validation_generator = validation_datagen.flow_from_dataframe(
     batch_size=batch_size
 )
 
-epochs=40
+epochs=50
 history = model.fit(
     train_generator, 
     epochs=epochs,
@@ -130,7 +130,7 @@ nb_samples = test_df.shape[0]
 test_gen = ImageDataGenerator(rescale=1./255)
 test_generator = test_gen.flow_from_dataframe(
     test_df, 
-    "test1/", 
+    "test1", 
     x_col='filename',
     y_col=None,
     class_mode=None,
@@ -139,7 +139,8 @@ test_generator = test_gen.flow_from_dataframe(
     shuffle=False
 )
 
-predict = model.predict(test_generator, steps=np.ceil(nb_samples/batch_size))
+predict = model.predict(test_generator, steps=int(np.ceil(nb_samples/batch_size)))
+
 
 test_df['category'] = np.argmax(predict, axis=-1)
 
