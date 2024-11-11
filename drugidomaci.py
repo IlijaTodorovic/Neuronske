@@ -111,6 +111,16 @@ validation_generator = validation_datagen.flow_from_dataframe(
     batch_size=batch_size
 )
 
+epochs = 35 
+history = model.fit(
+    train_generator,
+    epochs=epochs,
+    validation_data=validation_generator,
+    validation_steps=total_validate // batch_size,
+    steps_per_epoch=total_train // batch_size,
+    callbacks=callbacks
+)
+
 def predict_single_image(image_path):
   img = load_img(image_path, target_size=IMAGE_SIZE)
   img = np.array(img)
@@ -127,7 +137,8 @@ def label():
 
 map_ = label()
 
-for jpg in os.listdir("test1 copy"):
+for jpg in os.listdir("test1"):
   num = jpg.split(".")[0]
-  prd = predict_single_image(f"test1 copy/{jpg}")
+  prd = predict_single_image(f"test1/{jpg}")
   print(prd[0] == map_[int(num)])
+
