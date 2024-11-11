@@ -4,7 +4,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-import random
 import os
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, Activation, BatchNormalization
