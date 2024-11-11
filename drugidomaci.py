@@ -121,6 +121,8 @@ history = model.fit(
     callbacks=callbacks
 )
 
+final_train_accuracy = history.history['accuracy'][-1]
+
 def predict_single_image(image_path):
   img = load_img(image_path, target_size=IMAGE_SIZE)
   img = np.array(img)
@@ -137,8 +139,20 @@ def label():
 
 map_ = label()
 
+correct = 0
+total = 0
 for jpg in os.listdir("test1"):
   num = jpg.split(".")[0]
   prd = predict_single_image(f"test1/{jpg}")
-  print(prd[0] == map_[int(num)])
+  if prd[0] == map_[int(num)]:
+    print(prd[0] == map_[int(num)])
+    correct+=1
+  total+=1
+
+
+print(f"Završeni rezultati treninga:")
+
+print(f"Train Accuracy: {final_train_accuracy * 100:.2f}%")
+
+print(f"Test Accuracy: {correct / total * 100:.2f}%")  
 
